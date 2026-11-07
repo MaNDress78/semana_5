@@ -1,0 +1,23 @@
+
+    HISTORIAL DE USUARIOS
+Historia: Como dueña de una pagina que vende componentes en descuento, quiero cuando las unidades bajen por que se vendieron cuando queden solo 10 sube el precio a el 100% de su valor real para atraer trafico a la pagina y incitar la compra sin perder mucho dinero.
+
+Escenario: criterio 1
+  Dado que la memoria ram vale mucho se hacen ofertar en la pagina para atraer nuevos usuarios con precios baratos, de 200 a 100 dolares un 50%
+  Cuando son 20 ram
+  Entonces el producto se vera en producto es caso y se pedirán mas al probador
+    
+    CONTRATO
+Actúa como desarrollador Python que trabaja con pruebas primero.
+Contexto: aplicación de escritorio de una tienda (Python 3.11, pytest). Este es el contrato de la función:
+- Firma: maicol_and_opencode
+- Recibe: una base de datos en sql lite con datos de venta de cuanto se gana y se pierde por colocar un producto en oferta a perdida
+- Devuelve: una tabla clara donde se muestre el trafico que genero el descuento de el producto en la pagina wed, a que hora se vendieron cuantos se vendieron
+- Supuestos y límites: que  ningún producto se venda o todos se compren por la misma persona
+- Ejemplos:
+  se vendieron 20 rams a 20 personas distitas
+  ----------------------------------------------------------------
+  nobre/hora de venta/ ganancia por el producto/ porcentaje de descuento
+Tarea: primero escribe las pruebas en pytest para todos los ejemplos; después, la implementación más simple que las pase.
+Formato: dos bloques de código, pruebas e implementación, y una línea por cada supuesto que hayas tomado.
+Restricciones: solo la librería estándar; no cambies la firma; no modifiques la lista recibida.
