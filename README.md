@@ -10,7 +10,7 @@ lista de ganancias de sus ventas, respaldada por una base de datos SQLite.
 
 ### Historia de usuario
 
-**HU-05 — Precio según stock bajo** *(ajusta el identificador si tu documento de requisitos usa otro)*
+**HU-05 — Precio según stock bajo**
 
 Como dueña de una página que vende componentes en descuento, quiero que
 cuando queden solo 10 unidades de un producto el precio suba al 100 % de su

@@ -2,7 +2,7 @@
 
 Proyecto: Tienda de componentes (Memoria RAM en oferta)
 Estudiantes: Maicol Ramos Betancourt y Eduardo Tovar Roa
-Funcionalidad: HU-[xx] Cuando quedan 10 unidades, el precio sube al 100 % del valor real
+Funcionalidad: HU-05 Cuando quedan 10 unidades, el precio sube al 100 % del valor real
 Asistente usado: OpenCode en modo agente, con OpenRouter como proveedor (API key); modelos: Big Pickle, Claude Sonnet 5.5 y DeepSeek 4.2.
 
 ## Entradas
@@ -14,7 +14,7 @@ Asistente usado: OpenCode en modo agente, con OpenRouter como proveedor (API key
 - **Decisión:** Aceptada con cambios
 - **Por qué:** La estructura propuesta (un solo `index.html`, estilo minimalista claro, datos de ejemplo del contexto) me sirvió tal cual. Lo que cambié fue mi plan inicial: pensaba entregar una página con datos quemados, pero preferí hacer algo simple y a la vez funcional, así que pedí que el botón «Comprar» quedara preparado para conectarse a la base de datos.
 - **Verificación:** Abrí la página y revisé que la mitad superior mostrara la RAM (oferta $100, precio real $200, 50 % de descuento) y que la inferior tuviera la tabla con producto, hora de venta, ganancia y descuento, como en el ejemplo del contexto.
-- **Commit relacionado:** [pendiente: hash o mensaje]
+- **Commit relacionado:** `5c2d08d` — Implementación de ofertas, página web y servidor con SQLite (pruebas en verde)
 
 ### Entrada 2
 
@@ -23,7 +23,7 @@ Asistente usado: OpenCode en modo agente, con OpenRouter como proveedor (API key
 - **Decisión:** Aceptada
 - **Por qué:** Cumple el contrato del contexto: solo librería estándar, firma sin cambios y tablas `productos` y `ventas`. Además, deja funcional lo que antes era solo visual.
 - **Verificación:** Ejecuté las pruebas del documento contra esta implementación (ver entrada 4) y revisé que la base `tienda.db` se creara con la RAM (costo 150, precio real 200, oferta 100, stock 20).
-- **Commit relacionado:** [pendiente: hash o mensaje]
+- **Commit relacionado:** `5c2d08d` — Implementación de ofertas, página web y servidor con SQLite (pruebas en verde)
 
 ### Entrada 3
 
@@ -32,7 +32,7 @@ Asistente usado: OpenCode en modo agente, con OpenRouter como proveedor (API key
 - **Decisión:** Aceptada
 - **Por qué:** El cambio de puerto no afecta el contrato ni el comportamiento de la página, solo la dirección local.
 - **Verificación:** El servidor respondió HTTP 200 y la página cargó en `http://127.0.0.1:8765`.
-- **Commit relacionado:** [pendiente: hash o mensaje]
+- **Commit relacionado:** `5c2d08d` — Implementación de ofertas, página web y servidor con SQLite (pruebas en verde)
 
 ### Entrada 4
 
@@ -41,7 +41,7 @@ Asistente usado: OpenCode en modo agente, con OpenRouter como proveedor (API key
 - **Decisión:** Aceptada
 - **Por qué:** Las pruebas son la referencia del contrato (casos normales, de límite y de error) y las escribí antes de la implementación, así que no se modificó ninguna.
 - **Verificación:** `.venv/bin/python -m pytest -v` dio `9 passed`.
-- **Commit relacionado:** [pendiente: hash o mensaje]
+- **Commit relacionado:** `7d7d045` — Pruebas de ofertas por stock bajo (en rojo) y `5c2d08d` — Implementación con las pruebas en verde
 
 ### Entrada 5
 
@@ -50,7 +50,7 @@ Asistente usado: OpenCode en modo agente, con OpenRouter como proveedor (API key
 - **Decisión:** Aceptada
 - **Por qué:** Con esa regla las 20 ventas del ejemplo dan 10 × (-50) + 10 × (+50) = 0, es decir, punto de equilibrio. Eso es justo lo que pide la historia de usuario.
 - **Verificación:** Las pruebas de límite (11 unidades sigue en oferta, 10 unidades sube a precio real, stock inicial igual al umbral) pasan, y la suma de la ganancia en la tabla de las 20 ventas de ejemplo da 0.
-- **Commit relacionado:** [pendiente: hash o mensaje]
+- **Commit relacionado:** `f8e3742` — Refactor: extraer cálculo de precio y descuento a funciones reutilizables
 
 ## Resumen
 
@@ -62,7 +62,7 @@ Asistente usado: OpenCode en modo agente, con OpenRouter como proveedor (API key
 
 ## Errores que atraparon las pruebas
 
-En la ejecución registrada, las 9 pruebas pasaron a la primera, así que no hay un fallo real que documentar. [Pendiente: si durante el desarrollo falló alguna prueba, describir cuál, por qué falló y cómo se corrigió.]
+Las 9 pruebas se escribieron antes de la implementación y se commitearon en rojo (`7d7d045`). En esa fase fallaron porque el módulo `tienda/ofertas.py` todavía no existía, que es el resultado esperado del ciclo rojo-verde: la prueba define el contrato y falla hasta que hay código que lo cumpla. Tras la implementación (`5c2d08d`) las 9 pruebas pasaron. En la ejecución final no apareció un fallo de lógica que corregir; el refactor posterior (`f8e3742`) se hizo con las pruebas en verde y no las modificó.
 
 ## Reflexión final (5 a 8 líneas)
 
