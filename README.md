@@ -1,5 +1,7 @@
 # Tienda de componentes — Memoria RAM en oferta
 
+**Integrantes:** Maicol Ramos Betancourt y Eduardo Tovar Roa.
+
 Proyecto de la semana 5: primera funcionalidad con pruebas y bitácora de IA.
 Incluye una página web sencilla que muestra una Memoria RAM en oferta y la
 lista de ganancias de sus ventas, respaldada por una base de datos SQLite.

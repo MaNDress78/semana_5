@@ -1,7 +1,7 @@
 # Bitácora de uso de IA
 
 Proyecto: Tienda de componentes (Memoria RAM en oferta)
-Estudiante: Maicol Ramos Betancourt
+Estudiantes: Maicol Ramos Betancourt y Eduardo Tovar Roa
 Funcionalidad: HU-[xx] Cuando quedan 10 unidades, el precio sube al 100 % del valor real
 Asistente usado: OpenCode en modo agente, con OpenRouter como proveedor (API key); modelos: Big Pickle, Claude Sonnet 5.5 y DeepSeek 4.2.
 
