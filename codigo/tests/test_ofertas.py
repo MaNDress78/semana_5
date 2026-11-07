@@ -1,0 +1,165 @@
+"""Pruebas de HU: cuando quedan 10 unidades, el precio sube al 100 % del valor real.
+
+Escritas ANTES de la implementación (commit en rojo).
+
+Contrato que estas pruebas esperan (módulo tienda/ofertas.py):
+    crear_esquema(conn) -> None
+    crear_producto(conn, nombre, costo, precio_real, precio_oferta, stock) -> int
+    registrar_venta(conn, producto_id, comprador, hora_venta) -> None
+    maicol_and_opencode(conn) -> list[dict]
+        cada fila: nombre, hora_venta, ganancia, descuento_pct
+"""
+import sqlite3
+
+import pytest
+
+from tienda.ofertas import (
+    crear_esquema,
+    crear_producto,
+    maicol_and_opencode,
+    registrar_venta,
+)
+
+
+# ---------- Ayudas ----------
+
+@pytest.fixture
+def conn():
+    conexion = sqlite3.connect(":memory:")
+    crear_esquema(conexion)
+    yield conexion
+    conexion.close()
+
+
+@pytest.fixture
+def ram_id(conn):
+    """RAM: costo 150, precio real 200, oferta 100 (50 % de descuento), 20 unidades."""
+    return crear_producto(
+        conn,
+        nombre="Memoria RAM",
+        costo=150.0,
+        precio_real=200.0,
+        precio_oferta=100.0,
+        stock=20,
+    )
+
+
+def vender_a_personas_distintas(conn, producto_id, cantidad):
+    """Registra `cantidad` ventas de 1 unidad, cada una a un cliente distinto."""
+    for i in range(cantidad):
+        registrar_venta(
+            conn,
+            producto_id,
+            comprador=f"cliente{i + 1}",
+            hora_venta=f"2026-11-07 10:{i:02d}:00",
+        )
+
+
+# ---------- Casos normales ----------
+
+def test_crear_esquema_crea_las_tablas_productos_y_ventas(conn):
+    tablas = {
+        fila[0]
+        for fila in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
+    }
+    assert {"productos", "ventas"} <= tablas
+
+
+def test_20_ventas_a_20_personas_distintas_dan_20_filas_en_el_reporte(conn, ram_id):
+    vender_a_personas_distintas(conn, ram_id, 20)
+
+    reporte = maicol_and_opencode(conn)
+
+    assert len(reporte) == 20
+
+
+def test_primera_venta_sale_en_oferta_y_con_perdida(conn, ram_id):
+    vender_a_personas_distintas(conn, ram_id, 1)
+
+    reporte = maicol_and_opencode(conn)
+
+    assert reporte[0] == {
+        "nombre": "Memoria RAM",
+        "hora_venta": "2026-11-07 10:00:00",
+        "ganancia": -50.0,       # vendida a 100, costó 150
+        "descuento_pct": 50.0,   # de 200 a 100
+    }
+
+
+# ---------- Casos límite ----------
+
+def test_con_11_unidades_en_stock_la_venta_sigue_en_oferta(conn, ram_id):
+    # Las ventas 1 a 10 ocurren con 20, 19, ..., 11 unidades en stock.
+    vender_a_personas_distintas(conn, ram_id, 10)
+
+    reporte = maicol_and_opencode(conn)
+
+    assert all(fila["descuento_pct"] == 50.0 for fila in reporte)
+
+
+def test_con_10_unidades_en_stock_el_precio_sube_al_100_por_ciento(conn, ram_id):
+    # La venta 11 ocurre cuando quedan exactamente 10 unidades.
+    vender_a_personas_distintas(conn, ram_id, 11)
+
+    reporte = maicol_and_opencode(conn)
+
+    assert reporte[10] == {
+        "nombre": "Memoria RAM",
+        "hora_venta": "2026-11-07 10:10:00",
+        "ganancia": 50.0,        # vendida a 200, costó 150
+        "descuento_pct": 0.0,
+    }
+
+
+def test_producto_con_stock_inicial_igual_al_umbral_se_vende_a_precio_real(conn):
+    producto_id = crear_producto(
+        conn,
+        nombre="Memoria RAM",
+        costo=150.0,
+        precio_real=200.0,
+        precio_oferta=100.0,
+        stock=10,
+    )
+    vender_a_personas_distintas(conn, producto_id, 1)
+
+    reporte = maicol_and_opencode(conn)
+
+    assert reporte[0]["descuento_pct"] == 0.0
+
+
+def test_sin_ventas_el_reporte_es_una_lista_vacia(conn, ram_id):
+    assert maicol_and_opencode(conn) == []
+
+
+# ---------- Casos de error ----------
+
+def test_vender_un_producto_inexistente_lanza_value_error(conn):
+    with pytest.raises(ValueError):
+        registrar_venta(
+            conn,
+            producto_id=999,
+            comprador="cliente1",
+            hora_venta="2026-11-07 10:00:00",
+        )
+
+
+def test_vender_sin_stock_lanza_value_error_y_no_registra_la_venta(conn):
+    producto_id = crear_producto(
+        conn,
+        nombre="Memoria RAM",
+        costo=150.0,
+        precio_real=200.0,
+        precio_oferta=100.0,
+        stock=1,
+    )
+    vender_a_personas_distintas(conn, producto_id, 1)
+
+    with pytest.raises(ValueError):
+        registrar_venta(
+            conn,
+            producto_id,
+            comprador="cliente2",
+            hora_venta="2026-11-07 10:01:00",
+        )
+
+    assert len(maicol_and_opencode(conn)) == 1
