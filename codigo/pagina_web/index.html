@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tienda de Componentes</title>
+<style>
+  :root {
+    --fondo: #f4f5f7;
+    --tarjeta: #ffffff;
+    --texto: #1f2933;
+    --texto-suave: #6b7280;
+    --borde: #e5e7eb;
+    --acento: #2563eb;
+    --acento-oscuro: #1d4ed8;
+    --verde: #16a34a;
+    --rojo: #dc2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--fondo);
+    color: var(--texto);
+    line-height: 1.5;
+  }
+  .contenedor { width: min(960px, 92%); margin: 0 auto; }
+
+  .superior {
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+    padding: 32px 0;
+  }
+  .producto {
+    background: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    width: 100%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+  .icono {
+    flex: 0 0 140px;
+    height: 140px;
+    border-radius: 16px;
+    background: #eef2ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icono svg { width: 84px; height: 84px; color: var(--acento); }
+  .detalle { flex: 1; }
+  .detalle h1 { font-size: 1.6rem; margin-bottom: 4px; }
+  .detalle p { color: var(--texto-suave); margin-bottom: 16px; }
+  .precios { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .precio { font-size: 2rem; font-weight: 700; color: var(--acento); }
+  .precio-real { color: var(--texto-suave); text-decoration: line-through; font-size: 1.1rem; }
+  .insignia {
+    display: inline-block;
+    background: #dcfce7;
+    color: var(--verde);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  .insignia.normal { background: #fef3c7; color: #b45309; }
+  .fila-stock { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .stock { color: var(--texto-suave); font-size: 0.9rem; }
+  .stock strong { color: var(--texto); }
+  button {
+    font: inherit;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-weight: 600;
+    transition: background 0.15s ease;
+  }
+  .btn-comprar { background: var(--acento); color: #fff; }
+  .btn-comprar:hover:not(:disabled) { background: var(--acento-oscuro); }
+  .btn-comprar:disabled { background: #cbd5e1; cursor: not-allowed; }
+  .btn-secundario { background: #e5e7eb; color: var(--texto); }
+  .btn-secundario:hover { background: #d1d5db; }
+
+  .inferior { padding: 8px 0 48px; }
+  .titulo-seccion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .titulo-seccion h2 { font-size: 1.3rem; }
+  .acciones { display: flex; gap: 8px; flex-wrap: wrap; }
+  .resumen { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .tarjeta-resumen {
+    background: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    padding: 16px 20px;
+    flex: 1 1 160px;
+  }
+  .tarjeta-resumen span {
+    display: block;
+    color: var(--texto-suave);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .tarjeta-resumen strong { font-size: 1.3rem; }
+  .tabla-envoltura {
+    background: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    overflow-x: auto;
+  }
+  table { width: 100%; border-collapse: collapse; min-width: 560px; }
+  th, td { text-align: left; padding: 14px 20px; font-size: 0.95rem; }
+  th {
+    color: var(--texto-suave);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--borde);
+    background: #fafafa;
+  }
+  tbody tr:not(:last-child) td { border-bottom: 1px solid var(--borde); }
+  td.num { font-variant-numeric: tabular-nums; }
+  .ganancia-pos { color: var(--verde); font-weight: 600; }
+  .ganancia-neg { color: var(--rojo); font-weight: 600; }
+  .vacio { text-align: center; color: var(--texto-suave); padding: 32px 20px; }
+  .nota { color: var(--texto-suave); font-size: 0.85rem; margin-top: 16px; }
+  @media (max-width: 640px) {
+    .producto { flex-direction: column; text-align: center; }
+    .precios, .fila-stock { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+  <main class="contenedor">
+    <section class="superior">
+      <article class="producto">
+        <div class="icono" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="10" rx="2"/>
+            <path d="M6 7v10M10 7v10M14 7v10M18 7v10"/>
+          </svg>
+        </div>
+        <div class="detalle">
+          <h1 id="nombre-producto">Memoria RAM</h1>
+          <p>Módulo de memoria de alto rendimiento. Oferta por tiempo limitado para atraer nuevos clientes.</p>
+          <div class="precios">
+            <span class="precio" id="precio">$100</span>
+            <span class="precio-real" id="precio-real">$200</span>
+          </div>
+          <span class="insignia" id="insignia">50% de descuento</span>
+          <div class="fila-stock">
+            <span class="stock">Unidades disponibles: <strong id="stock">20</strong></span>
+            <button class="btn-comprar" id="btn-comprar" type="button">Comprar</button>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="inferior">
+      <div class="titulo-seccion">
+        <h2>Lista de ganancias</h2>
+        <div class="acciones">
+          <button class="btn-secundario" id="btn-ejemplo" type="button">Cargar ejemplo (20 ventas)</button>
+          <button class="btn-secundario" id="btn-reiniciar" type="button">Reiniciar</button>
+        </div>
+      </div>
+
+      <div class="resumen">
+        <div class="tarjeta-resumen"><span>Ventas registradas</span><strong id="total-ventas">0</strong></div>
+        <div class="tarjeta-resumen"><span>Ganancia total</span><strong id="total-ganancia">$0</strong></div>
+        <div class="tarjeta-resumen"><span>Stock restante</span><strong id="stock-restante">20</strong></div>
+      </div>
+
+      <div class="tabla-envoltura">
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Hora de venta</th>
+              <th>Ganancia</th>
+              <th>Descuento</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpo-tabla"></tbody>
+        </table>
+      </div>
+
+      <p class="nota">Ejecuta <code>python servidor.py</code> para guardar y leer los datos desde SQLite. Si abres el archivo directamente, la página funciona en modo de ejemplo.</p>
+    </section>
+  </main>
+
+<script>
+  const PRODUCTO = {
+    nombre: "Memoria RAM",
+    costo: 150,
+    precioReal: 200,
+    precioOferta: 100,
+    umbral: 10,
+    stockInicial: 20,
+  };
+
+  let stock = PRODUCTO.stockInicial;
+  let ventas = [];
+  let usandoApi = false;
+
+  const formatoMoneda = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+
+  function precioSegunStock() {
+    return stock > PRODUCTO.umbral ? PRODUCTO.precioOferta : PRODUCTO.precioReal;
+  }
+
+  function descuentoSegunPrecio(precio) {
+    return Math.round(((PRODUCTO.precioReal - precio) / PRODUCTO.precioReal) * 100 * 100) / 100;
+  }
+
+  function horaActual() {
+    const ahora = new Date();
+    const p = (n) => String(n).padStart(2, "0");
+    return ahora.getFullYear() + "-" + p(ahora.getMonth() + 1) + "-" + p(ahora.getDate()) +
+      " " + p(ahora.getHours()) + ":" + p(ahora.getMinutes()) + ":" + p(ahora.getSeconds());
+  }
+
+  function registrarVenta(hora) {
+    if (stock <= 0) return null;
+    const precio = precioSegunStock();
+    const venta = {
+      nombre: PRODUCTO.nombre,
+      hora_venta: hora,
+      ganancia: precio - PRODUCTO.costo,
+      descuento_pct: descuentoSegunPrecio(precio),
+    };
+    ventas.push(venta);
+    stock -= 1;
+    guardarVentaEnBaseDeDatos(venta);
+    return venta;
+  }
+
+  function guardarVentaEnBaseDeDatos(venta) {
+    return venta;
+  }
+
+  function aplicarEstado(datos) {
+    stock = datos.producto.stock;
+    ventas = datos.ventas;
+    render();
+  }
+
+  async function pedir(ruta, metodo) {
+    const respuesta = await fetch(ruta, { method: metodo });
+    const datos = await respuesta.json();
+    if (!respuesta.ok) throw new Error(datos.error || "Error del servidor");
+    return datos;
+  }
+
+  async function sincronizar() {
+    aplicarEstado(await pedir("/api/estado", "GET"));
+  }
+
+  async function cargarEjemplo() {
+    if (usandoApi) {
+      try {
+        aplicarEstado(await pedir("/api/ejemplo", "POST"));
+        return;
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+    stock = PRODUCTO.stockInicial;
+    ventas = [];
+    for (let i = 0; i < 20; i++) {
+      const hora = "2026-11-07 10:" + String(i).padStart(2, "0") + ":00";
+      registrarVenta(hora);
+    }
+    render();
+  }
+
+  async function reiniciar() {
+    if (usandoApi) {
+      try {
+        aplicarEstado(await pedir("/api/reiniciar", "POST"));
+        return;
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+    stock = PRODUCTO.stockInicial;
+    ventas = [];
+    render();
+  }
+
+  function renderProducto() {
+    const precio = precioSegunStock();
+    const descuento = descuentoSegunPrecio(precio);
+    const enOferta = descuento > 0;
+
+    document.getElementById("precio").textContent = formatoMoneda.format(precio);
+    document.getElementById("precio-real").style.display = enOferta ? "inline" : "none";
+    document.getElementById("insignia").textContent = enOferta ? descuento + "% de descuento" : "Precio normal";
+    document.getElementById("insignia").classList.toggle("normal", !enOferta);
+    document.getElementById("stock").textContent = stock;
+
+    const boton = document.getElementById("btn-comprar");
+    boton.disabled = stock <= 0;
+    boton.textContent = stock <= 0 ? "Sin stock" : "Comprar";
+  }
+
+  function renderResumen() {
+    const total = ventas.reduce((suma, venta) => suma + venta.ganancia, 0);
+    document.getElementById("total-ventas").textContent = ventas.length;
+    document.getElementById("total-ganancia").textContent = formatoMoneda.format(total);
+    document.getElementById("stock-restante").textContent = stock;
+  }
+
+  function renderTabla() {
+    const cuerpo = document.getElementById("cuerpo-tabla");
+    cuerpo.innerHTML = "";
+
+    if (ventas.length === 0) {
+      const fila = document.createElement("tr");
+      fila.innerHTML = '<td class="vacio" colspan="4">No hay ventas registradas.</td>';
+      cuerpo.appendChild(fila);
+      return;
+    }
+
+    const ordenadas = [...ventas].sort((a, b) => a.hora_venta.localeCompare(b.hora_venta));
+    for (const venta of ordenadas) {
+      const fila = document.createElement("tr");
+
+      const producto = document.createElement("td");
+      producto.textContent = venta.nombre;
+
+      const hora = document.createElement("td");
+      hora.textContent = venta.hora_venta;
+
+      const ganancia = document.createElement("td");
+      ganancia.className = "num " + (venta.ganancia >= 0 ? "ganancia-pos" : "ganancia-neg");
+      ganancia.textContent = (venta.ganancia >= 0 ? "+" : "") + formatoMoneda.format(venta.ganancia);
+
+      const descuento = document.createElement("td");
+      descuento.className = "num";
+      descuento.textContent = venta.descuento_pct + "%";
+
+      fila.append(producto, hora, ganancia, descuento);
+      cuerpo.appendChild(fila);
+    }
+  }
+
+  function render() {
+    renderProducto();
+    renderResumen();
+    renderTabla();
+  }
+
+  async function comprar() {
+    if (usandoApi) {
+      try {
+        aplicarEstado(await pedir("/api/comprar", "POST"));
+        return;
+      } catch (error) {
+        console.warn(error);
+        return;
+      }
+    }
+    registrarVenta(horaActual());
+    render();
+  }
+
+  document.getElementById("btn-comprar").addEventListener("click", comprar);
+  document.getElementById("btn-ejemplo").addEventListener("click", cargarEjemplo);
+  document.getElementById("btn-reiniciar").addEventListener("click", reiniciar);
+
+  (async function iniciar() {
+    try {
+      await sincronizar();
+      usandoApi = true;
+    } catch (error) {
+      usandoApi = false;
+      render();
+    }
+  })();
+</script>
+</body>
+</html>
