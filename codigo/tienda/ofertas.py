@@ -3,6 +3,14 @@ import sqlite3
 UMBRAL_STOCK = 10
 
 
+def precio_segun_stock(stock: int, precio_real: float, precio_oferta: float) -> float:
+    return precio_oferta if stock > UMBRAL_STOCK else precio_real
+
+
+def calcular_descuento_pct(precio_real: float, precio: float) -> float:
+    return round((precio_real - precio) / precio_real * 100, 2)
+
+
 def crear_esquema(conn: sqlite3.Connection) -> None:
     conn.executescript(
         """
@@ -68,8 +76,8 @@ def registrar_venta(
     if stock <= 0:
         raise ValueError("No hay stock disponible")
 
-    precio = precio_oferta if stock > UMBRAL_STOCK else precio_real
-    descuento_pct = round((precio_real - precio) / precio_real * 100, 2)
+    precio = precio_segun_stock(stock, precio_real, precio_oferta)
+    descuento_pct = calcular_descuento_pct(precio_real, precio)
 
     conn.execute(
         """

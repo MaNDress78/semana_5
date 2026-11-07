@@ -6,10 +6,11 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from tienda.ofertas import (
-    UMBRAL_STOCK,
+    calcular_descuento_pct,
     crear_esquema,
     crear_producto,
     maicol_and_opencode,
+    precio_segun_stock,
     registrar_venta,
 )
 
@@ -49,8 +50,8 @@ def estado(conexion: sqlite3.Connection) -> dict:
     producto = None
     if fila is not None:
         stock = fila["stock"]
-        precio = fila["precio_oferta"] if stock > UMBRAL_STOCK else fila["precio_real"]
-        descuento = round((fila["precio_real"] - precio) / fila["precio_real"] * 100, 2)
+        precio = precio_segun_stock(stock, fila["precio_real"], fila["precio_oferta"])
+        descuento = calcular_descuento_pct(fila["precio_real"], precio)
         producto = {
             "id": fila["id"],
             "nombre": fila["nombre"],
